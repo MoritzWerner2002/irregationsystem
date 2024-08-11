@@ -15,8 +15,9 @@ private:
 
 public:
     // Konstruktor
-    Pflanze(String n, int fb, int bi, unsigned long lb, int bd);
+    Pflanze(String n, int fb, int bi, unsigned long lb);
 
+    int calcBewasserungsdauer(double Wassermenge, double Schlauchlaenge);
     // Methode zur Messung der Feuchtigkeit
     int feuchtigkeitMessen(int Pin);
 

@@ -10,10 +10,10 @@ using namespace std;
 #define PUMP_PIN 15
 #define MOISTURE_SENSOR_PIN A0
 #define MOISTURE_THRESHOLD 650 // Schwellenwert für Feuchtigkeit
-#define PUMP_DURATION 5000 // Pumpe läuft 5 Sekunden
+
 
 RTC_DS3231 rtc;
-Pflanze aloeVera("Aloe Vera", MOISTURE_THRESHOLD, 10000, 0, PUMP_DURATION);
+Pflanze aloeVera("Aloe Vera", MOISTURE_THRESHOLD, 10000, 0);
 
 bool isSoilDry;
 bool isDaytime;
@@ -22,17 +22,20 @@ double mean_moist;
 
 void setup()
 {
-    pinMode(PUMP_PIN, OUTPUT);
-    digitalWrite(PUMP_PIN, LOW); // Initialize the pump as off
-    Wire.begin();
-    rtc.begin();
+  pinMode(PUMP_PIN, OUTPUT);
+  digitalWrite(PUMP_PIN, LOW); // Initialize the pump as off
+  Wire.begin();
+  rtc.begin();
 
-    // Prüfen, ob die RTC läuft
-    if (rtc.lostPower()) {
-        rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    }
+  // Prüfen, ob die RTC läuft
+  if (rtc.lostPower()) {
+      rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  }
 
-    Serial.begin(9600);
+  //Bewässerungsdauer ausrechnen
+  aloeVera.calcBewasserungsdauer(0.25, 2.5);
+
+  Serial.begin(9600);
 }
 
 void loop()
@@ -54,8 +57,9 @@ void loop()
   isSoilDry = moist > MOISTURE_THRESHOLD;
 
   // Bedingung 2: Es ist zwischen 6 Uhr morgens und 8 Uhr abends
-  isDaytime = (now.hour() >= 8 && now.hour() <= 23);
-  sleep_ms(60000);
+  isDaytime = (now.hour() >= 7 && now.hour() <= 22);
+  isDaytime = true;
+  sleep_ms(30000);
   // Wenn beide Bedingungen erfüllt sind, die Pumpe einschalten
   if (isSoilDry && isDaytime) {
       aloeVera.bewasserungAusloesen();
@@ -75,6 +79,5 @@ void loop()
   Serial.print(':');
   Serial.print(now.second());
   Serial.println();*/
-
-  delay(1000); // 1 Sekunde warten
+  delay(100); // 1 Sekunde warten
 }
